@@ -1,0 +1,42 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity clk_div is
+  Port (clk: in std_logic;
+        clk25: out std_logic );
+end clk_div;
+
+architecture Behavioral of clk_div is
+signal clk_div: integer:=1;
+signal clk2:  std_logic:='0'; 
+begin
+
+process(clk)
+begin
+
+if rising_edge(clk) then
+
+    clk_div<=clk_div + 1;
+    if clk_div =2 then
+        clk_div<=1;
+        clk2<=not(clk2);
+
+    end if;
+end if;
+clk25<=clk2;
+end process;
+
+end Behavioral;
+
+

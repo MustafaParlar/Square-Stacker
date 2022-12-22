@@ -1,0 +1,392 @@
+
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity vga_sync is
+ Port ( clk,space : in  std_logic;
+ hsync, vsync,product,winner: out  std_logic ;
+ red,green,blue: out STD_LOGIC_VECTOR(3 downto 0));
+end vga_sync ;
+
+architecture Behavioral of vga_sync is
+Signal hpos : integer range 0 to 800 := 0 ;
+Signal vpos: integer range 0 to 525 := 0;
+signal count0,count1,count2,count3,count4,count5,count6,count7: integer range 0 to 400001:=0;
+signal counter0,counter1,counter2,counter3,counter4,counter5,counter6,counter7,counter8: integer range 0 to 30000000:=0;
+signal s0,s1,s2,s3,s4,s5,s6,s7 : integer range 0 to 139:=0;
+
+
+type states is ( start,line0, line1, line2, line3, line4,line5, line6,line7 );
+signal state, n_state : states := start; 
+
+type square0c is array (0 to 49,0 to 49) of  std_logic;
+signal square0: square0c:= (others=> (others=>'1'));
+type square2c is array (0 to 23,0 to 139) of  std_logic;
+signal square2 : square2c:=(
+
+"00000000000000011000000000000000000000000000000000000000000000000000000000001110000000000000000000000000000001000000000000000000000000000000",
+"00000000000001100111000000000000000000000000000000000000000000000000000000010001110000000000000000000000000011000000000000000000000000000000",
+"00000000000011000001000000000000000000000000000000000000000000000000000000100000110000000000000000000000000001000000000000000000000000000000",
+"00000000000011000001000000000000000000000000000000000000000000000000000001100000010000100000000000000000000001000000000000000000000000000000",
+"00000000000011000000000000000000000000000000000000000000000000000000000001100000000000100000000000000000000001000000000000000000000000000000",
+"00000000000011100000000000111010001000010000011110000110110001111000000000111000000001110000111000000111100001000110000011100000101100000000",
+"00000000000001111000000011001110001000011000100011001110110010001100000000011100000001100011001100001000110001000110000100110011101100000000",
+"00000000000000111110000110000110001000011000100011000110000110001100000000001111000001100011000100011000110001001000001000011001100000000000",
+"00000000000000001111000110000110001000011000000011000110000110001100000000000011100001100000001100010000000001010000001000011001100000000000",
+"00000000000000000011100100000110001000011000001111000110000100000000000000000001110001100000111100010000000001110000001000000001100000000000",
+"00000000000000000001100110000110001000011000110011000110000110000000000000000000110001100001000100010000000001011000011000000001100000000000",
+"00000000000010000001100110000110001000011001100011000110000110000000000000000000010001100011000100011000000001001100001000000001100000000000",
+"00000000000010000001100110000110001100011001100011000110000111000100000000100000010001100011000100011100010001000100001100001001100000000000",
+"00000000000011000011000011101110001101111101110111100110000011111000000000110000100001111011111111001111100011000110000111110001100000000000",
+"00000000000000011110000001100110000110010000110011000000000001110000000000001111000000110001100110000111000000000000000011100000000000000000",
+"00000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+"00000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+"00000000000000000000000000000110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+"00000000000000000000000000001110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+);
+begin
+
+
+
+process(clk,space)
+begin
+if rising_edge(clk) then
+    case state is
+    when start=>
+        counter4 <=0;
+        if counter5 <20000000 then
+            counter5 <=counter5+1;
+        end if;
+        if (space ='1' and counter5>10000000) then
+            counter5<=0;
+            state<= line0;
+        else
+            state<=start;
+        end if;
+    when line0 =>
+        s1<=0;
+        s2<=0;
+        s3<=0;
+        s4<=0;
+        s5<=0;
+        s6<=0;
+        s7<=0;
+
+        counter0<=0;
+        counter1<=0;
+        counter2<=0;
+        counter3<=0;
+        counter5<=0;
+        counter6<=0;
+        counter7<=0;
+        counter8<=0;
+        product<='0';
+        winner<='0';
+        if counter4 <20000000 then
+            counter4 <=counter4+1;
+        end if;
+        count0 <=count0+1;
+        if (count0 = 400000) then
+            s0 <= s0 + 1;
+            count0 <= 0;
+        end if;
+        if (space ='1' and counter4>10000000) then
+            counter4<=0;
+            state<= line1;
+        else
+            state<=line0;
+        end if;
+    when line1 =>
+        if counter0 <20000000 then
+            counter0 <=counter0+1;
+        end if;
+        count1 <=count1+1;
+        if (count1 = 300000) then
+            s1 <= s1 + 1;
+            count1 <= 0;
+        end if;
+        
+        if (space ='1' and counter0>10000000) then
+            counter0<=0;
+            if ((s1<(s0+10)) and (s1>(s0-10))) then
+                state<= line2;
+            else
+                product<='1';
+                state<=start;
+            end if;
+        else
+            state<=line1;
+        end if;
+        
+    when line2 =>
+        if counter1 <20000000 then
+            counter1 <=counter1+1;
+        end if;
+        count2 <=count2+1;
+        if (count2 = 300000) then
+            s2 <= s2 + 1;
+            count2 <= 0;
+        end if;
+        if (space ='1' and counter1>10000000) then
+            counter1<=0;
+            if ((s2<(s1+10)) and (s2>(s1-10))) then
+                state<= line3;
+            else
+                product<='1';
+                state<=start;
+            end if;                
+        else
+            state<=line2;        
+        end if;
+        
+    when line3 =>
+        if counter2 <20000000 then
+            counter2 <=counter2+1;
+        end if;
+        count3 <=count3+1;
+        if (count3 = 300000) then
+            s3 <= s3 + 1;
+            count3 <= 0;
+        end if;
+        if (space ='1' and counter2>10000000) then
+            counter2<=0;
+            if ((s3<(s2+10)) and (s3>(s2-10))) then
+                state<= line5;
+            else
+                product<='1';
+                state<=start;
+            end if;
+        else
+            state<=line3;
+        end if;
+        
+    when line5 =>
+       if counter6 <20000000 then
+           counter6 <=counter6+1;
+       end if;
+       count5 <=count5+1;
+       if (count5 = 300000) then
+           s5 <= s5 + 1;
+           count5 <= 0;
+       end if;
+       if (space ='1' and counter6>10000000) then
+           counter6<=0;
+           if ((s5<(s3+10)) and (s5>(s3-10))) then
+               state<= line6;
+           else
+               product<='1';
+               state<=start;
+           end if;
+       else
+           state<=line5;
+       end if;
+    when line6 =>
+          if counter7 <20000000 then
+              counter7 <=counter7+1;
+          end if;
+          count6 <=count6+1;
+          if (count6 = 300000) then
+              s6 <= s6 + 1;
+              count6 <= 0;
+          end if;
+          if (space ='1' and counter7>10000000) then
+              counter7<=0;
+              if ((s6<(s5+10)) and (s6>(s5-10))) then
+                  state<= line7;
+              else
+                  product<='1';
+                  state<=start;
+              end if;
+          else
+              state<=line6;
+          end if;
+    when line7 =>
+        if counter8 <20000000 then
+            counter8 <=counter8+1;
+        end if;
+        count7 <=count7+1;
+        if (count7 = 300000) then
+            s7 <= s7 + 1;
+            count7 <= 0;
+        end if;
+        if (space ='1' and counter8>10000000) then
+            counter8<=0;
+            if ((s7<(s6+10)) and (s7>(s6-10))) then
+                state<= line4;
+            else
+                product<='1';
+                state<=start;
+            end if;
+        else
+            state<=line7;
+        end if;
+    when line4 => 
+        if counter3 <20000000 then
+            counter3 <=counter3+1;
+        end if; 
+        count4 <=count4+1;
+        if (count4 = 300000) then
+            s4 <= s4 + 1;
+            count4 <= 0;
+        end if;
+        if (space ='1' and counter3>10000000) then
+            counter3<=0;
+            state<=start;
+            if ((s4<(s7+10)) and (s4>(s7-10))) then
+                winner<='1';
+            else
+                product<='1';
+            end if;
+        else
+            state<=line4;
+        end if;
+
+end case;
+end if;
+end process; 
+
+
+process (clk) 
+begin
+if rising_edge(clk) then
+        
+    if (hpos = 800) then 
+        hpos <= 0;
+        if vpos < 525 then 
+            vpos <= vpos + 1 ;
+        else 
+            vpos <= 0; 
+        end if;
+    else 
+        hpos <=hpos + 1;
+    end if;
+
+    if (hpos > 16 and hpos < 113) then
+        hsync <= '0';
+    else 
+        hsync <= '1';
+    end if; 
+
+    if (vpos > 10 and vpos < 13) then
+        vsync <= '1';
+    else 
+        vsync <= '0';
+    end if;
+    
+
+    if (hpos >= 40+4*s0 and hpos < 4*s0+89 and vpos < 525 and vpos >= 475  ) then
+        if square0((vpos - (475)),(hpos-40))='1' then
+            red <= (others => '1');
+            green <= "0000";
+            blue <= "0000";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+
+    elsif (hpos >= 40+4*s1 and hpos < 4*s1+89 and vpos < 475 and vpos >= 425  ) then
+        if square0((vpos - (425)),(hpos-40))='1' then
+            red <= "0000";
+            green <= "1111";
+            blue <= "0000";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+        
+    elsif (hpos >= 40+4*s2 and hpos < 4*s2+89 and vpos < 425 and vpos >= 375  ) then
+        if square0((vpos - (375)),(hpos-40))='1' then
+            red <= (others => '1');
+            green <= "1100";
+            blue <= "0001";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+    elsif (hpos >= 40+4*s3 and hpos < 4*s3+89 and vpos < 375 and vpos >= 325  ) then
+        if square0((vpos - (325)),(hpos-40))='1' then
+            red <= (others => '1');
+            green <= "1100";
+            blue <= "1000";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+    elsif (hpos >= 40+4*s5 and hpos < 4*s5+89 and vpos < 325 and vpos >= 275  ) then
+        if square0((vpos - (275)),(hpos-40))='1' then
+            red <= "1100";
+            green <= "1100";
+            blue <= "1101";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+    elsif (hpos >= 40+4*s6 and hpos < 4*s6+89 and vpos < 275 and vpos >= 225  ) then
+        if square0((vpos - (225)),(hpos-40))='1' then
+            red <= (others => '1');
+            green <= "0000";
+            blue <= "1101";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+    elsif (hpos >= 40+4*s7 and hpos < 4*s7+89 and vpos < 225 and vpos >= 175  ) then
+        if square0((vpos - (175)),(hpos-40))='1' then
+            red <= (others => '1');
+            green <= "1110";
+            blue <= "1100";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;
+     elsif (hpos >= 40+4*s4 and hpos < 4*s4+89 and vpos < 175 and vpos >= 125  ) then
+           if square0((vpos - (125)),(hpos-40))='1' then
+               red <= (others => '1');
+               green <= "1100";
+               blue <= "1111";
+           else 
+               red <= (others => '0');
+               green <= (others => '0');
+               blue <= (others => '0');
+           end if;
+        
+        
+    
+    elsif (hpos >= 270 and hpos < 690 and vpos <125 and vpos >= 53  ) then
+        if square2(((vpos-53)/3),((hpos-270)/3))='1' then
+            red <= (others => '1');
+            green <= "1111";
+            blue <= "0000";
+        else 
+            red <= (others => '0');
+            green <= (others => '0');
+            blue <= (others => '0');
+        end if;  
+   else 
+       red <= (others => '0');
+       green <= (others => '0');
+       blue <= (others => '0');
+       end if;
+end if;
+
+end process;
+
+end Behavioral;
+
+
+

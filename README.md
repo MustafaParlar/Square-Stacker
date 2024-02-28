@@ -2,6 +2,8 @@
 This project uses a VGA monitor to display a simple tower building game designed on VHDL.  
 [Project_mp.docx](https://github.com/MustafaParlar/Square-Stacker/files/10289374/Project_mp.docx)
 
+Image resolution was decreased to improve compiling time when testing.
+
 Results:
 
  ![image](https://github.com/MustafaParlar/Square-Stacker/assets/121253152/b0a31b16-0a3f-4ce3-b889-d7e703ca206d)
